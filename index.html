@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saifi Carpenters - Budget & 2D Drawing</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e67e22;
+            --bg-color: #f5f6fa;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        canvas {
+            background-color: #FFFFFF !important;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            cursor: crosshair;
+        }
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .clear-btn { background-color: #e74c3c; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f8f5;
+            border-left: 5px solid #2ecc71;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Saifi Carpenters Smart Tool</h1>
+    <p>Budget Calculator & 2D Drawing Board</p>
+</header>
+
+<div class="container">
+    <!-- Budget Section -->
+    <div class="card">
+        <h2>Layout और बजट (Budget Calculator)</h2>
+        <form id="budgetForm">
+            <div class="form-group">
+                <label for="materialType">लकड़ी/मटीरियल का प्रकार:</label>
+                <select id="materialType">
+                    <option value="1200">Plywood (Commercial) - ₹1200/sq.ft</option>
+                    <option value="1800">MDF / HDMR - ₹1800/sq.ft</option>
+                    <option value="2500">Teak Wood (सागवान) - ₹2500/sq.ft</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="areaSize">कुल एरिया (स्क्वायर फीट में):</label>
+                <input type="number" id="areaSize" placeholder="उदा. 50" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="laborCost">लेबर चार्ज (प्रति स्क्वायर फीट ₹):</label>
+                <input type="number" id="laborCost" value="350" min="0" required>
+            </div>
+            <button type="button" id="calcBtn">बजट का हिसाब लगाएं</button>
+        </form>
+
+        <div id="result" class="result-box">
+            <h3>अनुमानित लागत (Estimated Cost):</h3>
+            <p>मटीरियल खर्च: <span id="resMaterial">₹0</span></p>
+            <p>लेबर खर्च: <span id="resLabor">₹0</span></p>
+            <hr>
+            <h4>कुल बजट: <span id="resTotal" style="color: #27ae60; font-size: 1.3rem;">₹0</span></h4>
+        </div>
+    </div>
+
+    <!-- Drawing Section -->
+    <div class="card canvas-container">
+        <h2>📐 2D ड्राइंग ऑप्शन (Drawing Board)</h2>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 0;">यहाँ फर्नीचर का रफ़ साइज़ या डिज़ाइन ड्रा करें</p>
+        <canvas id="drawingCanvas" width="450" height="350"></canvas>
+        <div class="controls">
+            <input type="color" id="colorPicker" value="#2c3e50">
+            <input type="range" id="lineWidth" min="1" max="10" value="3">
+            <button class="clear-btn" id="clearBtn">साफ करें (Clear)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.getElementById('colorPicker');
+    const lineWidth = document.getElementById('lineWidth');
+    const clearBtn = document.getElementById('clearBtn');
+    const calcBtn = document.getElementById('calcBtn');
+
+    let drawing = false;
+
+    function initCanvas() {
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    initCanvas();
+
+    function getMousePos(evt) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (evt.clientX || (evt.touches && evt.touches[0] ? evt.touches[0].clientX : 0)) - rect.left,
+            y: (evt.clientY || (evt.touches && evt.touches[0] ? evt.touches[0].clientY : 0)) - rect.top
+        };
+    }
+
+    function startDrawing(e) {
+        drawing = true;
+        ctx.beginPath();
+        const pos = getMousePos(e);
+        ctx.moveTo(pos.x, pos.y);
+    }
+
+    function draw(e) {
+        if (!drawing) return;
+        const pos = getMousePos(e);
+        ctx.lineWidth = lineWidth.value;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = colorPicker.value;
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+
+    function stopDrawing() { drawing = false; }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+    canvas.addEventListener('touchend', stopDrawing);
+
+    clearBtn.addEventListener('click', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        initCanvas();
+    });
+
+    calcBtn.addEventListener('click', () => {
+        const materialRate = parseFloat(document.getElementById('materialType').value);
+        const area = parseFloat(document.getElementById('areaSize').value);
+        const laborRate = parseFloat(document.getElementById('laborCost').value);
+
+        if (isNaN(area) || area <= 0) {
+            alert("कृपया सही एरिया साइज दर्ज करें।");
+            return;
+        }
+
+        const totalMaterial = materialRate * area;
+        const totalLabor = laborRate * area;
+        const finalTotal = totalMaterial + totalLabor;
+
+        document.getElementById('resMaterial').innerText = "₹" + totalMaterial.toLocaleString('en-IN');
+        document.getElementById('resLabor').innerText = "₹" + totalLabor.toLocaleString('en-IN');
+        document.getElementById('resTotal').innerText = "₹" + finalTotal.toLocaleString('en-IN');
+        document.getElementById('result').style.display = "block";
+    });
+</script>
+</body>
+</html>
