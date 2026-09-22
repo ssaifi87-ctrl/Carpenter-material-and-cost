@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saifi Carpenter Premium Calculator</title>
+    <title>Saifi Carpenter Premium Dashboard</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #eef2f3; margin: 0; padding: 15px; display: flex; justify-content: center; }
@@ -17,12 +17,20 @@
         .btn-success:hover { background-color: #218838; }
         .btn-danger { background-color: #dc3545; }
         .btn-danger:hover { background-color: #c82333; }
+        .btn-info { background-color: #17a2b8; color: white; margin-top: 10px; }
+        .btn-info:hover { background-color: #138496; }
         .switch-link { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; font-size: 14px; text-decoration: underline; }
         .hidden { display: none; }
         .record-card { background: #f8f9fa; border-left: 5px solid #28a745; padding: 15px; margin-top: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .record-img, .preview-visual { max-width: 100%; height: auto; border-radius: 8px; margin-top: 12px; display: block; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
         .result-box { background: #d4edda; padding: 12px; border-radius: 6px; margin-top: 15px; text-align: center; font-weight: bold; color: #155724; font-size: 16px; }
         .photo-container { margin-top: 15px; text-align: center; }
+        
+        /* 🎥 3D Video Popup Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; position: relative; text-align: center; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #333; font-weight: bold; }
+        .video-frame { width: 100%; height: 280px; border-radius: 8px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -71,10 +79,13 @@
             <option value="ultra">अल्ट्रा प्रीमियम (HDMR + पीयू पॉलिश/विनियर)</option>
         </select>
         
-        <!-- 🖼️ Realistic फोटो बॉक्स -->
+        <!-- 🖼 silence 3D/Realistic फोटो बॉक्स -->
         <div class="photo-container">
             <label style="margin-top:0; text-align:left;">Realistic डिज़ाइन प्रीव्यू:</label>
-            <img id="realistic-view" class="preview-visual" src="https://unsplash.com" alt="Realistic Concept">
+            <img id="realistic-view" class="preview-visual" src="" alt="Realistic Concept">
+            
+            <!-- 🛠️ 3D Assemble वीडियो देखने का बटन -->
+            <button id="assemble-btn" class="btn-info" onclick="openAssembleVideo()">🛠️ 3D Assembly वीडियो देखें</button>
         </div>
 
         <label style="margin-top:20px;">चौड़ाई (फिट में):</label>
@@ -102,21 +113,56 @@
     </div>
 </div>
 
+<!-- 📺 वीडियो पॉपअप बॉक्स (Modal Window) -->
+<div id="videoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAssembleVideo()">&times;</span>
+        <h3 id="modal-video-title">3D Assembly Guide</h3>
+        <iframe id="assemble-video-player" class="video-frame" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+</div>
+
 <script>
     let loggedInUser = null;
     let lastCalculatedBudget = 0;
 
-    // Realistic फोटो लिंक्स (Unsplash से ली गई हाई-क्वालिटी फिनिशिंग इमेजेस)
+    // Realistic HD फोटो लिंक्स
     const realisticPhotos = {
         wardrobe: "https://unsplash.com",
         kitchen: "https://unsplash.com",
         door: "https://unsplash.com"
     };
 
-    // काम बदलने पर Realistic फोटो चेंज करना
+    // 3D Assembly एनिमेटेड वीडियो लिंक्स (YouTube Embed)
+    const assembleVideos = {
+        wardrobe: "https://youtube.com", 
+        kitchen: "https://youtube.com",  
+        door: "https://youtube.com"     
+    };
+
+    // काम बदलने पर Realistic फोटो और 3D वीडियो को अपडेट करना
     function updateRealisticView() {
         const work = document.getElementById('work-type').value;
         document.getElementById('realistic-view').src = realisticPhotos[work];
+        
+        // वीडियो लिंक और टाइटल सेट करना
+        document.getElementById('assemble-video-player').src = assembleVideos[work];
+        const titles = { wardrobe: "अलमारी 3D Assembly गाइड", kitchen: "मॉड्यूलर किचन 3D Assembly गाइड", door: "दरवाजा Installation गाइड" };
+        document.getElementById('modal-video-title').innerText = titles[work];
+    }
+
+    // पॉपअप वीडियो खोलने और बंद करने के लॉजिक्स
+    function openAssembleVideo() {
+        document.getElementById('videoModal').style.display = 'flex';
+    }
+
+    function closeAssembleVideo() {
+        document.getElementById('videoModal').style.display = 'none';
+        // वीडियो बंद होने पर प्लेयर रीसेट करना ताकि बैकग्राउंड म्यूजिक बंद हो जाए
+        const player = document.getElementById('assemble-video-player');
+        const currentSrc = player.src;
+        player.src = '';
+        player.src = currentSrc;
     }
 
     function toggleScreen(showLogin) {
@@ -148,64 +194,3 @@
     function calculateBudget() {
         const work = document.getElementById('work-type').value;
         const quality = document.getElementById('material-quality').value;
-        const w = parseFloat(document.getElementById('width').value);
-        const h = parseFloat(document.getElementById('height').value);
-        
-        if(!w || !h || w <= 0 || h <= 0) return alert("कृपया सही साइज दर्ज करें");
-        
-        // बेस रेट्स तय करना
-        let baseRate = 0;
-        if (work === 'wardrobe') baseRate = 1200;
-        if (work === 'kitchen') baseRate = 1500;
-        if (work === 'door') baseRate = 800;
-
-        // मटीरियल क्वालिटी के हिसाब से रेट बढ़ाना
-        let multiplier = 1.0;
-        if (quality === 'luxury') multiplier = 1.4; // 40% ज्यादा महंगा
-        if (quality === 'ultra') multiplier = 1.8;  // 80% ज्यादा महंगा
-
-        const finalRate = baseRate * multiplier;
-        lastCalculatedBudget = w * h * finalRate;
-        
-        const resBox = document.getElementById('calc-result');
-        resBox.classList.remove('hidden');
-        resBox.innerHTML = `कुल साइज: ${w*h} Sq.Ft | रेट: ₹${finalRate}/Sq.Ft<br>अनुमानित बजट: ₹${lastCalculatedBudget.toLocaleString('en-IN')}/-`;
-    }
-
-    function saveRecord() {
-        const title = document.getElementById('job-title').value.trim();
-        const fileInput = document.getElementById('job-photo').files;
-        if(!title || lastCalculatedBudget === 0) return alert("पहले बजट निकालें और ग्राहक का नाम भरें!");
-
-        if (fileInput.length > 0) {
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                sendRecordToServer(title, lastCalculatedBudget, reader.result);
-            };
-            reader.readAsDataURL(fileInput[0]);
-        } else {
-            sendRecordToServer(title, lastCalculatedBudget, "");
-        }
-    }
-
-    async function sendRecordToServer(title, budget, photoBase64) {
-        const res = await fetch('/api/save-record', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: loggedInUser,
-                title,
-                budget: `₹${budget.toLocaleString('en-IN')}/-`,
-                photo: photoBase64
-            })
-        });
-        if(res.ok) {
-            alert("बधाई हो! ग्राहक का रिकॉर्ड तिजोरी में सेव हो गया।");
-            document.getElementById('job-title').value = '';
-            document.getElementById('job-photo').value = '';
-            loadRecords();
-        }
-    }
-
-    async function loadRecords() {
-        const res = await fetch(`/api/records/${loggedInUser}`);
