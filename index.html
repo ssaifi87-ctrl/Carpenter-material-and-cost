@@ -3,221 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saifi Carpenters - Budget & 2D Drawing</title>
+    <title>Saifi Carpenter Premium Calculator</title>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #e67e22;
-            --bg-color: #f5f6fa;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-        }
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            text-align: center;
-            padding: 15px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; }
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        h2 {
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 8px;
-            margin-top: 0;
-        }
-        .canvas-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        canvas {
-            background-color: #FFFFFF !important;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            cursor: crosshair;
-        }
-        .controls {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-        }
-        button {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .clear-btn { background-color: #e74c3c; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="number"], select {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .result-box {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f8f5;
-            border-left: 5px solid #2ecc71;
-            border-radius: 4px;
-            display: none;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #eef2f3; margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 480px; }
+        h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
+        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
+        input, select { width: 100%; padding: 12px; margin-top: 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.2s; }
+        button:hover { background-color: #0056b3; }
+        .btn-success { background-color: #28a745; }
+        .btn-success:hover { background-color: #218838; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #c82333; }
+        .switch-link { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; font-size: 14px; text-decoration: underline; }
+        .hidden { display: none; }
+        .record-card { background: #f8f9fa; border-left: 5px solid #28a745; padding: 15px; margin-top: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .record-img, .preview-visual { max-width: 100%; height: auto; border-radius: 8px; margin-top: 12px; display: block; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+        .result-box { background: #d4edda; padding: 12px; border-radius: 6px; margin-top: 15px; text-align: center; font-weight: bold; color: #155724; font-size: 16px; }
+        .photo-container { margin-top: 15px; text-align: center; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Saifi Carpenters Smart Tool</h1>
-    <p>Budget Calculator & 2D Drawing Board</p>
-</header>
-
 <div class="container">
-    <!-- Budget Section -->
-    <div class="card">
-        <h2>Layout और बजट (Budget Calculator)</h2>
-        <form id="budgetForm">
-            <div class="form-group">
-                <label for="materialType">लकड़ी/मटीरियल का प्रकार:</label>
-                <select id="materialType">
-                    <option value="1200">Plywood (Commercial) - ₹1200/sq.ft</option>
-                    <option value="1800">MDF / HDMR - ₹1800/sq.ft</option>
-                    <option value="2500">Teak Wood (सागवान) - ₹2500/sq.ft</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="areaSize">कुल एरिया (स्क्वायर फीट में):</label>
-                <input type="number" id="areaSize" placeholder="उदा. 50" min="1" required>
-            </div>
-            <div class="form-group">
-                <label for="laborCost">लेबर चार्ज (प्रति स्क्वायर फीट ₹):</label>
-                <input type="number" id="laborCost" value="350" min="0" required>
-            </div>
-            <button type="button" id="calcBtn">बजट का हिसाब लगाएं</button>
-        </form>
-
-        <div id="result" class="result-box">
-            <h3>अनुमानित लागत (Estimated Cost):</h3>
-            <p>मटीरियल खर्च: <span id="resMaterial">₹0</span></p>
-            <p>लेबर खर्च: <span id="resLabor">₹0</span></p>
-            <hr>
-            <h4>कुल बजट: <span id="resTotal" style="color: #27ae60; font-size: 1.3rem;">₹0</span></h4>
-        </div>
+    <!-- 🔑 लॉगिन स्क्रीन -->
+    <div id="login-screen">
+        <h2>Saifi Carpenter लॉगिन</h2>
+        <label>यूज़रनेम:</label>
+        <input type="text" id="login-user" placeholder="अपना यूज़रनेम डालें">
+        <label>पासवर्ड:</label>
+        <input type="password" id="login-pass" placeholder="अपना पासवर्ड डालें">
+        <button onclick="auth('/api/login', 'login-user', 'login-pass')">लॉगिन करें</button>
+        <div class="switch-link" onclick="toggleScreen(false)">नया अकाउंट (Sign Up) बनाएं</div>
     </div>
 
-    <!-- Drawing Section -->
-    <div class="card canvas-container">
-        <h2>📐 2D ड्राइंग ऑप्शन (Drawing Board)</h2>
-        <p style="font-size: 0.9rem; color: #666; margin-top: 0;">यहाँ फर्नीचर का रफ़ साइज़ या डिज़ाइन ड्रा करें</p>
-        <canvas id="drawingCanvas" width="450" height="350"></canvas>
-        <div class="controls">
-            <input type="color" id="colorPicker" value="#2c3e50">
-            <input type="range" id="lineWidth" min="1" max="10" value="3">
-            <button class="clear-btn" id="clearBtn">साफ करें (Clear)</button>
+    <!-- 📝 साइनअप स्क्रीन -->
+    <div id="signup-screen" class="hidden">
+        <h2>नया कारपेंटर अकाउंट</h2>
+        <label>यूज़रनेम चुनें:</label>
+        <input type="text" id="signup-user" placeholder="उदा. saifi_furniture">
+        <label>पासवर्ड बनाएं:</label>
+        <input type="password" id="signup-pass" placeholder="कम से कम 4 अक्षर">
+        <button class="btn-success" onclick="auth('/api/signup', 'signup-user', 'signup-pass', true)">अकाउंट रजिस्टर करें</button>
+        <div class="switch-link" onclick="toggleScreen(true)">अकाउंट है? लॉगिन करें</div>
+    </div>
+
+    <!-- 📊 कारपेंटर डैशबोर्ड (लॉगिन के बाद) -->
+    <div id="dashboard-screen" class="hidden">
+        <h2 id="welcome-msg">खाता चालू है</h2>
+        <hr>
+        
+        <h3>📐 बजट और Realistic लुक</h3>
+        
+        <label>काम का प्रकार चुनें:</label>
+        <select id="work-type" onchange="updateRealisticView()">
+            <option value="wardrobe">अलमारी / वार्डरोब (Wardrobe)</option>
+            <option value="kitchen">मॉड्यूलर किचन (Modular Kitchen)</option>
+            <option value="door">डिजाइनर दरवाजा (Premium Door)</option>
+        </select>
+
+        <label>मटीरियल और फिनिश क्वालिटी:</label>
+        <select id="material-quality">
+            <option value="normal">नॉर्मल फिनिश (कमर्शियल प्लाई + सनमाइका)</option>
+            <option value="luxury">लक्ज़री फिनिश (वाटरप्रूफ प्लाई + एक्रिलिक/लैमिनेट)</option>
+            <option value="ultra">अल्ट्रा प्रीमियम (HDMR + पीयू पॉलिश/विनियर)</option>
+        </select>
+        
+        <!-- 🖼️ Realistic फोटो बॉक्स -->
+        <div class="photo-container">
+            <label style="margin-top:0; text-align:left;">Realistic डिज़ाइन प्रीव्यू:</label>
+            <img id="realistic-view" class="preview-visual" src="https://unsplash.com" alt="Realistic Concept">
         </div>
+
+        <label style="margin-top:20px;">चौड़ाई (फिट में):</label>
+        <input type="number" id="width" placeholder="उदा. 6" value="6">
+        
+        <label>ऊंचाई (फिट में):</label>
+        <input type="number" id="height" placeholder="उदा. 7" value="7">
+        
+        <button onclick="calculateBudget()">बजट का अनुमान लगाएं</button>
+        <div id="calc-result" class="result-box hidden"></div>
+
+        <label style="margin-top:25px;">ग्राहक का नाम (रिकॉर्ड रखने के लिए):</label>
+        <input type="text" id="job-title" placeholder="उदा. शर्मा जी का फ्लैट काम">
+        
+        <label>साइट की असली फोटो अपलोड करें (यदि उपलब्ध हो):</label>
+        <input type="file" id="job-photo" accept="image/*">
+        
+        <button class="btn-success" onclick="saveRecord()">हिसाब और फोटो डेटाबेस में सेव करें</button>
+        
+        <hr style="margin-top: 30px;">
+        <h3>📁 आपके पुराने रिकॉर्ड्स (तिजोरी)</h3>
+        <div id="records-list">लोड हो रहा है...</div>
+        
+        <button class="btn-danger" onclick="logout()">सुरक्षित लॉगआऊट (Logout)</button>
     </div>
 </div>
 
 <script>
-    const canvas = document.getElementById('drawingCanvas');
-    const ctx = canvas.getContext('2d');
-    const colorPicker = document.getElementById('colorPicker');
-    const lineWidth = document.getElementById('lineWidth');
-    const clearBtn = document.getElementById('clearBtn');
-    const calcBtn = document.getElementById('calcBtn');
+    let loggedInUser = null;
+    let lastCalculatedBudget = 0;
 
-    let drawing = false;
+    // Realistic फोटो लिंक्स (Unsplash से ली गई हाई-क्वालिटी फिनिशिंग इमेजेस)
+    const realisticPhotos = {
+        wardrobe: "https://unsplash.com",
+        kitchen: "https://unsplash.com",
+        door: "https://unsplash.com"
+    };
 
-    function initCanvas() {
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    initCanvas();
-
-    function getMousePos(evt) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-            x: (evt.clientX || (evt.touches && evt.touches[0] ? evt.touches[0].clientX : 0)) - rect.left,
-            y: (evt.clientY || (evt.touches && evt.touches[0] ? evt.touches[0].clientY : 0)) - rect.top
-        };
+    // काम बदलने पर Realistic फोटो चेंज करना
+    function updateRealisticView() {
+        const work = document.getElementById('work-type').value;
+        document.getElementById('realistic-view').src = realisticPhotos[work];
     }
 
-    function startDrawing(e) {
-        drawing = true;
-        ctx.beginPath();
-        const pos = getMousePos(e);
-        ctx.moveTo(pos.x, pos.y);
+    function toggleScreen(showLogin) {
+        document.getElementById('login-screen').classList.toggle('hidden', !showLogin);
+        document.getElementById('signup-screen').classList.toggle('hidden', showLogin);
     }
 
-    function draw(e) {
-        if (!drawing) return;
-        const pos = getMousePos(e);
-        ctx.lineWidth = lineWidth.value;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = colorPicker.value;
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
+    async function auth(url, userField, passField, isSignup = false) {
+        const username = document.getElementById(userField).value.trim();
+        const password = document.getElementById(passField).value.trim();
+        if(!username || !password) return alert("कृपया दोनों बॉक्स भरें");
+
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        
+        if(res.ok) {
+            alert(data.message || "लॉगिन सफल!");
+            if(!isSignup) {
+                loggedInUser = data.username;
+                showDashboard();
+            } else { toggleScreen(true); }
+        } else { alert(data.error); }
     }
 
-    function stopDrawing() { drawing = false; }
+    function calculateBudget() {
+        const work = document.getElementById('work-type').value;
+        const quality = document.getElementById('material-quality').value;
+        const w = parseFloat(document.getElementById('width').value);
+        const h = parseFloat(document.getElementById('height').value);
+        
+        if(!w || !h || w <= 0 || h <= 0) return alert("कृपया सही साइज दर्ज करें");
+        
+        // बेस रेट्स तय करना
+        let baseRate = 0;
+        if (work === 'wardrobe') baseRate = 1200;
+        if (work === 'kitchen') baseRate = 1500;
+        if (work === 'door') baseRate = 800;
 
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDrawing);
-    
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
-    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
-    canvas.addEventListener('touchend', stopDrawing);
+        // मटीरियल क्वालिटी के हिसाब से रेट बढ़ाना
+        let multiplier = 1.0;
+        if (quality === 'luxury') multiplier = 1.4; // 40% ज्यादा महंगा
+        if (quality === 'ultra') multiplier = 1.8;  // 80% ज्यादा महंगा
 
-    clearBtn.addEventListener('click', () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        initCanvas();
-    });
+        const finalRate = baseRate * multiplier;
+        lastCalculatedBudget = w * h * finalRate;
+        
+        const resBox = document.getElementById('calc-result');
+        resBox.classList.remove('hidden');
+        resBox.innerHTML = `कुल साइज: ${w*h} Sq.Ft | रेट: ₹${finalRate}/Sq.Ft<br>अनुमानित बजट: ₹${lastCalculatedBudget.toLocaleString('en-IN')}/-`;
+    }
 
-    calcBtn.addEventListener('click', () => {
-        const materialRate = parseFloat(document.getElementById('materialType').value);
-        const area = parseFloat(document.getElementById('areaSize').value);
-        const laborRate = parseFloat(document.getElementById('laborCost').value);
+    function saveRecord() {
+        const title = document.getElementById('job-title').value.trim();
+        const fileInput = document.getElementById('job-photo').files;
+        if(!title || lastCalculatedBudget === 0) return alert("पहले बजट निकालें और ग्राहक का नाम भरें!");
 
-        if (isNaN(area) || area <= 0) {
-            alert("कृपया सही एरिया साइज दर्ज करें।");
-            return;
+        if (fileInput.length > 0) {
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                sendRecordToServer(title, lastCalculatedBudget, reader.result);
+            };
+            reader.readAsDataURL(fileInput[0]);
+        } else {
+            sendRecordToServer(title, lastCalculatedBudget, "");
         }
+    }
 
-        const totalMaterial = materialRate * area;
-        const totalLabor = laborRate * area;
-        const finalTotal = totalMaterial + totalLabor;
+    async function sendRecordToServer(title, budget, photoBase64) {
+        const res = await fetch('/api/save-record', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: loggedInUser,
+                title,
+                budget: `₹${budget.toLocaleString('en-IN')}/-`,
+                photo: photoBase64
+            })
+        });
+        if(res.ok) {
+            alert("बधाई हो! ग्राहक का रिकॉर्ड तिजोरी में सेव हो गया।");
+            document.getElementById('job-title').value = '';
+            document.getElementById('job-photo').value = '';
+            loadRecords();
+        }
+    }
 
-        document.getElementById('resMaterial').innerText = "₹" + totalMaterial.toLocaleString('en-IN');
-        document.getElementById('resLabor').innerText = "₹" + totalLabor.toLocaleString('en-IN');
-        document.getElementById('resTotal').innerText = "₹" + finalTotal.toLocaleString('en-IN');
-        document.getElementById('result').style.display = "block";
-    });
-</script>
-</body>
-</html>
+    async function loadRecords() {
+        const res = await fetch(`/api/records/${loggedInUser}`);
