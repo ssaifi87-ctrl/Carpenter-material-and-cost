@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saifi Carpenter Budget Calculator</title>
+    <title>Saifi Carpenter Budget Calculator with Ads</title>
+    <!-- Google AdMob/AdSense Script (वेब और हाइब्रिड ऐप्स के लिए लोड करना) -->
+    <script async src="https://googlesyndication.com" crossorigin="anonymous"></script>
+    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #121212; color: #fff; padding: 20px; text-align: center; min-height: 100vh; }
+        body { background: #121212; color: #fff; padding: 20px; text-align: center; min-height: 100vh; padding-bottom: 70px; /* विज्ञापन के लिए नीचे जगह छोड़ी गई है */ }
         .container { max-width: 500px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #333; }
         h1 { color: #00ff00; margin-bottom: 10px; font-size: 24px; }
         p { color: #aaa; margin-bottom: 20px; font-size: 14px; }
@@ -22,6 +25,21 @@
         /* स्क्रीन नेविगेशन */
         .screen { display: none; }
         .active { display: block; }
+
+        /* 📱 फिक्स बैनर विज्ञापन का स्टाइल (Bottom Banner) */
+        .admob-banner-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            border-top: 1px solid #333;
+        }
     </style>
 </head>
 <body>
@@ -86,29 +104,39 @@
         </div>
     </div>
 
+    <!-- 📱 यह वो डिब्बा है जहाँ नीचे विज्ञापन लोड होगा -->
+    <div class="admob-banner-container">
+        <!-- गूगल का ऑफिशियल टेस्ट बैनर कोड -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:320px;height:50px"
+             data-ad-client="ca-pub-3940256099942544"
+             data-ad-slot="6300978111"></ins>
+    </div>
+
     <script>
-        // स्क्रीन बदलने का फंक्शन (अलमारी और किचन का अलग-अलग पेज)
         document.addEventListener('DOMContentLoaded', () => {
             showScreen('home-screen');
+            // विज्ञापनों को एक्टिवेट/पुश करना
+            try {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+                console.log("AdMob लोड होने में समय लग रहा है...");
+            }
         });
 
         function showScreen(screenId) {
-            // सभी स्क्रीन छुपाएं
             const screens = document.querySelectorAll('.screen');
             screens.forEach(screen => screen.classList.remove('active'));
             
-            // चुनी हुई स्क्रीन दिखाएं
             const activeScreen = document.getElementById(screenId);
             if (activeScreen) {
                 activeScreen.classList.add('active');
             }
             
-            // पुराने रिजल्ट्स साफ करें
             document.getElementById('almari-result').style.display = 'none';
             document.getElementById('kitchen-result').style.display = 'none';
         }
 
-        // अलमारी का बजट कैलकुलेशन
         function calculateAlmari() {
             const width = parseFloat(document.getElementById('almari-width').value);
             const height = parseFloat(document.getElementById('almari-height').value);
@@ -127,7 +155,6 @@
             resultBox.style.display = 'block';
         }
 
-        // किचन का बजट कैलकुलेशन
         function calculateKitchen() {
             const length = parseFloat(document.getElementById('kitchen-length').value);
             const rate = parseFloat(document.getElementById('kitchen-rate').value);
@@ -138,7 +165,6 @@
                 return;
             }
 
-            // मटीरियल के हिसाब से थोड़ा एक्स्ट्रा चार्ज (लॉजिक के लिए)
             let materialMultiplier = 1.0;
             if (material === 'premium') materialMultiplier = 1.2;
             if (material === 'hdmr') materialMultiplier = 1.35;
