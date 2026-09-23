@@ -3,146 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Furniture & Doc Scanner</title>
+    <title>Saifi Carpenter Budget Calculator</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #121212; color: #fff; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 100vh; padding: 20px; }
-        
-        .btn { background: #00ff00; color: #000; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; transition: 0.3s; margin: 10px; }
+        body { background: #121212; color: #fff; padding: 20px; text-align: center; min-height: 100vh; }
+        .container { max-width: 500px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #333; }
+        h1 { color: #00ff00; margin-bottom: 10px; font-size: 24px; }
+        p { color: #aaa; margin-bottom: 20px; font-size: 14px; }
+        .btn { background: #00ff00; color: #000; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 25px; cursor: pointer; transition: 0.3s; width: 100%; margin: 10px 0; }
         .btn:hover { background: #00cc00; }
-        
-        /* स्क्रीन लेआउट्स */
-        #home-screen { display: block; }
-        #scanner-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* स्कैनिंग स्क्वायर और लेज़र एनीमेशन */
-        .scan-container { position: absolute; top: 15%; left: 10%; width: 80%; height: 60%; border: 3px solid #00ff00; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); border-radius: 8px; overflow: hidden; }
-        .laser-line { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: rgba(0, 255, 0, 0.8); box-shadow: 0 0 15px #00ff00; animation: scanAnimation 2s infinite linear; }
-        
-        @keyframes scanAnimation {
-            0% { top: 0%; }
-            50% { top: 100%; }
-            100% { top: 0%; }
-        }
-        
-        /* रिजल्ट और सेटिंग्स स्क्रीन */
-        #result-screen { display: none; background: #1e1e1e; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; width: 100%; }
-        .preview-box { width: 100%; max-height: 250px; border: 2px solid #333; margin-bottom: 20px; border-radius: 8px; display: none; object-fit: contain; background: #000; }
-        
+        .btn-back { background: #555; color: #fff; }
+        .btn-back:hover { background: #444; }
         .form-group { text-align: left; margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; color: #aaa; }
-        select, input { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 8px; font-size: 16px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: #ccc; }
+        input, select { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 8px; font-size: 16px; }
+        .result-box { margin-top: 20px; padding: 15px; background: #252525; border-radius: 8px; border: 1px dashed #00ff00; font-size: 18px; font-weight: bold; color: #00ff00; display: none; }
         
-        .status-text { font-size: 22px; color: #00ff00; font-weight: bold; margin-bottom: 15px; }
-        
-        /* सोफा ऑप्शंस लिस्ट स्टाइल */
-        .sub-options-list { margin-top: 10px; background: #151515; border-radius: 8px; padding: 10px; display: none; text-align: left; max-height: 200px; overflow-y: auto; }
-        .sub-item { padding: 8px; border-bottom: 1px solid #222; font-size: 15px; color: #ddd; }
-        .sub-item:last-child { border: none; }
+        /* स्क्रीन नेविगेशन */
+        .screen { display: none; }
+        .active { display: block; }
     </style>
 </head>
 <body>
 
-    <!-- 1. होम स्क्रीन -->
-    <div id="home-screen">
-        <h1>दस्तावेज़ एवं फ़र्नीचर स्कैनर</h1>
-        <p style="color: #888; margin: 15px 0 25px;">डॉक्यूमेंट स्कैन करें और सोफा सेट कैटलॉग देखें</p>
-        
-        <!-- मुख्य स्कैन बटन -->
-        <button class="btn" onclick="startScanning()">Scan Document</button>
-        
-        <hr style="border: 1px solid #222; margin: 25px 0;">
-
-        <!-- फ़र्नीचर ऑप्शंस सेक्शन -->
-        <div class="form-group">
-            <label style="font-size: 16px; font-weight: bold; color: #00ff00;">मुख्य फ़र्नीचर चुनें (10 विकल्प):</label>
-            <select id="main-furniture-select" onchange="loadSubOptions()">
-                <option value="">-- कृपया एक विकल्प चुनें --</option>
-                <option value="mandir_sofa">1. Mandir Sofa Set (मंदिर सोफा सेट)</option>
-                <option value="luxury_sofa">2. Luxury L-Shape Sofa</option>
-                <option value="wooden_sofa">3. Traditional Wooden Sofa</option>
-                <option value="modern_recliner">4. Modern Recliner Set</option>
-                <option value="chesterfield">5. Classic Chesterfield</option>
-                <option value="sofa_bed">6. Convertible Sofa Bed</option>
-                <option value="office_sofa">7. Executive Office Sofa</option>
-                <option value="velvet_lounge">8. Premium Velvet Lounge</option>
-                <option value="compact_2seater">9. Compact 2-Seater Sofa</option>
-                <option value="modular_sectional">10. Modular Sectional Sofa</option>
-            </select>
+    <div class="container">
+        <!-- 1. होम स्क्रीन -->
+        <div id="home-screen" class="screen active">
+            <h1>सैफी कारपेंटर बजट कैलकुलेटर</h1>
+            <p>कृपया बजट बनाने के लिए नीचे दी गई कैटेगरी में से कोई एक चुनें:</p>
+            <button class="btn" onclick="showScreen('almari-screen')">1. अलमारी का बजट (Almari Budget)</button>
+            <button class="btn" onclick="showScreen('kitchen-screen')">2. मॉड्यूलर किचन बजट (Kitchen Budget)</button>
         </div>
 
-        <!-- सब-ऑप्शंस दिखाने का बॉक्स -->
-        <div id="sub-options-container" class="sub-options-list"></div>
-    </div>
-
-    <!-- 2. लाइव कैमरा और लेज़र स्क्रीन -->
-    <div id="scanner-screen">
-        <video id="camera-view" autoplay playsinline></video>
-        <div class="scan-container">
-            <div class="laser-line"></div>
-        </div>
-    </div>
-
-    <!-- 3. स्कैन कम्प्लीट और सेव स्क्रीन (Assemble विकल्प यहाँ से हटा दिया गया है) -->
-    <div id="result-screen">
-        <div class="status-text">✓ Scan Complete</div>
-        
-        <!-- View बटन और प्रीव्यू इमेज -->
-        <button class="btn" style="background:#555; color:#fff;" onclick="togglePreview()">View Document</button>
-        <img id="doc-preview" class="preview-box" alt="Preview">
-
-        <!-- फॉर्मेट और क्वालिटी सेटिंग्स -->
-        <div class="form-group" style="margin-top: 15px;">
-            <label>फाइल फॉर्मेट चुनें (Save As)</label>
-            <select id="file-format">
-                <option value="pdf">PDF Document (.pdf)</option>
-                <option value="jpg">Image (.jpg)</option>
-                <option value="gif">Animation (.gif)</option>
-            </select>
+        <!-- 2. अलमारी बजट स्क्रीन -->
+        <div id="almari-screen" class="screen">
+            <h1>अलमारी बजट कैलकुलेटर</h1>
+            <p>Dimensions और Rate दर्ज करें</p>
+            
+            <div class="form-group">
+                <label>चौड़ाई (Width - फीट में):</label>
+                <input type="number" id="almari-width" placeholder="उदाहरण: 6">
+            </div>
+            <div class="form-group">
+                <label>ऊँचाई (Height - फीट में):</label>
+                <input type="number" id="almari-height" placeholder="उदाहरण: 7">
+            </div>
+            <div class="form-group">
+                <label>Quotation Rate (प्रति स्क्वेयर फीट):</label>
+                <input type="number" id="almari-rate" placeholder="उदाहरण: 1200">
+            </div>
+            
+            <button class="btn" onclick="calculateAlmari()">बजट कैलकुलेट करें</button>
+            <div id="almari-result" class="result-box"></div>
+            <button class="btn btn-back" onclick="showScreen('home-screen')">← वापस जाएँ</button>
         </div>
 
-        <div class="form-group">
-            <label>रेजोल्यूशन (Quality)</label>
-            <select id="file-resolution">
-                <option value="high">High Resolution (1080p)</option>
-                <option value="medium">Medium Resolution (720p)</option>
-                <option value="low">Low Resolution (480p)</option>
-            </select>
+        <!-- 3. किचन बजट स्क्रीन -->
+        <div id="kitchen-screen" class="screen">
+            <h1>किचन बजट कैलकुलेटर</h1>
+            <p>किचन का साइज़ और रेट दर्ज करें</p>
+            
+            <div class="form-group">
+                <label>किचन की कुल लम्बाई (Running Feet):</label>
+                <input type="number" id="kitchen-length" placeholder="उदाहरण: 10">
+            </div>
+            <div class="form-group">
+                <label>मटीरियल टाइप (Material Type):</label>
+                <select id="kitchen-material">
+                    <option value="standard">Standard Plywood (नॉर्मल प्लाई)</option>
+                    <option value="premium">Premium Waterproof (वाटरप्रूफ प्लाई)</option>
+                    <option value="hdmr">HDMR Board (हाई क्वालिटी बोर्ड)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Quotation Rate (प्रति रनिंग फीट):</label>
+                <input type="number" id="kitchen-rate" placeholder="उदाहरण: 2500">
+            </div>
+            
+            <button class="btn" onclick="calculateKitchen()">बजट कैलकुलेट करें</button>
+            <div id="kitchen-result" class="result-box"></div>
+            <button class="btn btn-back" onclick="showScreen('home-screen')">← वापस जाएँ</button>
         </div>
-
-        <div class="form-group">
-            <label>फाइल का नाम (Rename)</label>
-            <input type="text" id="file-name" value="Scanned_Doc_1">
-        </div>
-
-        <!-- अंतिम सेव बटन -->
-        <button class="btn" onclick="saveDocument()">Save Document</button>
     </div>
 
     <script>
-        let streamRef = null;
-        const video = document.getElementById('camera-view');
-        const previewImg = document.getElementById('doc-preview');
+        // स्क्रीन बदलने का फंक्शन (अलमारी और किचन का अलग-अलग पेज)
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen('home-screen');
+        });
 
-        // सभी 10 मुख्य विकल्पों के अंदर के 10-10 सब-ऑप्शंस का डेटा (Fix)
-        const furnitureData = {
-            mandir_sofa: [
-                "1. Traditional Wooden Mandir Sofa", "2. Golden Carved Mandir Sofa", 
-                "3. Premium Teakwood Sofa Set", "4. Compact Puja Room Seating", 
-                "5. Royal Velvet Mandir Chair", "6. White Marble Matching Sofa", 
-                "7. Modern Low-Height Mandir Sofa", "8. Cushion Carved Bench Seating", 
-                "9. Classic Rosewood Sofa Set", "10. Customized Devotional Sofa"
-            ],
-            luxury_sofa: ["1. L-Shape 5 Seater", "2. L-Shape 7 Seater", "3. Fabric Sectional", "4. Leatherette L-Shape", "5. Corner Luxury Fit", "6. Adjustable Headrest", "7. Storage Sectional", "8. Velvet L-Shape", "9. Modern Italian Cut", "10. Premium Tufted Sofa"],
-            wooden_sofa: ["1. Pure Sheesham 3+1+1", "2. Teak Wood Classic", "3. Minimalist Wooden", "4. Antique Polish Finish", "5. Walnut Wood Style", "6. Curved Handrest Wooden", "7. Fabric Cushion Wooden", "8. Heavy Box Wooden", "9. Budget Engineered Wood", "10. Royal Sheesham Carved"],
-            modern_recliner: ["1. Single Motor Recliner", "2. 3-Seater Home Theatre", "3. Manual Leather Recliner", "4. Fabric Rocking Recliner", "5. Dual Side Recliner Sofa", "6. Swivel Recliner Chair", "7. Executive Power Recliner", "8. Luxury Cup Holder Recliner", "9. Massage Recliner Set", "10. Sleek Compact Recliner"],
-            chesterfield: ["1. Deep Tufted Tan Leather", "2. Royal Blue Velvet Chesterfield", "3. Emerald Green 3-Seater", "4. Modern Microfiber Velvet", "5. Classic Faux Leather", "6. Low-Back Tufted Sofa", "7. Vintage Brown Leather", "8. Grey Linen Chesterfield", "9. Premium High-Back Tufted", "10. Compact Studio Chesterfield"],
-            sofa_bed: ["1. Click-Clack Sofa Bed", "2. Pull-Out Queen Size", "3. L-Shape Storage Sofa Bed", "4. Single Folding Futon", "5. Fabric Daybed", "6. Metal Frame Sofa Bed", "7. Modern Velvet Sleeper", "8. Dual Utility Sectional Bed", "9. Kids Mini Sofa Bed", "10. Premium Orthopedic Foam Bed"],
-            office_sofa: ["1. Black Genuine Leather 3-Seater", "2. Sleek Chrome Frame Sofa", "3. Reception Room Lounge Set", "4. High-Density Foam Office Seating", "5. Minimalist Grey Fabric", "6. Executive Cabin Sofa", "7. Modular Office Lounge", "8. Ergonomic Visitor Bench", "9. Compact Semi-Leather Sofa", "10. Premium Tufted Office Sofa"],
-            velvet_lounge: ["1. Premium Curved Lounge Chair", "2. Royal Velvet Chaise", "3. Pastel Pink Modern Sofa", "4. Deep Green Wingback Lounge", "5. Luxury Daybed Velvet", "6. Tufted Velvet Bench", "7. Contemporary Round Sofa", "8. High-Gloss Velvet Sectional", "9. Golden Leg Accent Sofa", "10. Custom Designer Lounge Set"],
-            compact_2seater: ["1. Loveseat for Apartments", "2. Scandinavian Wooden 2-Seater", "3. Mid-Century Modern Loveseat", "4. Sleek Leather 2-Seater", "5. Tufted Fabric Loveseat", "6. High-Leg Studio Sofa", "7. Cushion-Back Compact Sofa", "8. Budget Microfiber 2-Seater", "9. Armless Compact Bench", "10. Vintage Parlour Loveseat"],
-            modular_sectional: ["1. U-Shape 9 Seater Giant", "2. Infinite Configuration Modular", "3. Moving Block Sectional", "4. Performance Fabric Modular", "5. Low-Profile Floor Sectional", "6. Cozy Oversized Blocks", "7. Waterproof Outdoor Sectional", "8. Custom Fabric Sectional Blocks", "9. Corner Fitting Modular", "10. Eco-Friendly Material Sectional"]
-        };
+        function showScreen(screenId) {
+            // सभी स्क्रीन छुपाएं
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+            
+            // चुनी हुई स्क्रीन दिखाएं
+            const activeScreen = document.getElementById(screenId);
+            if (activeScreen) {
+                activeScreen.classList.add('active');
+            }
+            
+            // पुराने रिजल्ट्स साफ करें
+            document.getElementById('almari-result').style.display = 'none';
+            document.getElementById('kitchen-result').style.display = 'none';
+        }
 
-        // सोफा सेट प्रकार लोड और शो करने का फंक्शन (Fix)
+        // अलमारी का बजट कैलकुलेशन
+        function calculateAlmari() {
+            const width = parseFloat(document.getElementById('almari-width').value);
+            const height = parseFloat(document.getElementById('almari-height').value);
+            const rate = parseFloat(document.getElementById('almari-rate').value);
+
+            if (isNaN(width) || isNaN(height) || isNaN(rate) || width <= 0 || height <= 0 || rate <= 0) {
+                alert("कृपया सभी फील्ड्स में सही संख्या दर्ज करें।");
+                return;
+            }
+
+            const totalArea = width * height;
+            const totalBudget = totalArea * rate;
+
+            const resultBox = document.getElementById('almari-result');
+            resultBox.innerHTML = `कुल एरिया: ${totalArea.toFixed(2)} Sq.Ft.<br>अनुमानित बजट: ₹${totalBudget.toLocaleString('en-IN')}/-`;
+            resultBox.style.display = 'block';
+        }
+
+        // किचन का बजट कैलकुलेशन
+        function calculateKitchen() {
+            const length = parseFloat(document.getElementById('kitchen-length').value);
+            const rate = parseFloat(document.getElementById('kitchen-rate').value);
+            const material = document.getElementById('kitchen-material').value;
+
+            if (isNaN(length) || isNaN(rate) || length <= 0 || rate <= 0) {
+                alert("कृपया सभी फील्ड्स में सही संख्या दर्ज करें।");
+                return;
+            }
+
+            // मटीरियल के हिसाब से थोड़ा एक्स्ट्रा चार्ज (लॉजिक के लिए)
+            let materialMultiplier = 1.0;
+            if (material === 'premium') materialMultiplier = 1.2;
+            if (material === 'hdmr') materialMultiplier = 1.35;
+
+            const totalBudget = length * rate * materialMultiplier;
+
+            const resultBox = document.getElementById('kitchen-result');
+            resultBox.innerHTML = `कुल लम्बाई: ${length} Running Ft.<br>अनुमानित बजट: ₹${Math.round(totalBudget).toLocaleString('en-IN')}/-`;
+            resultBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
