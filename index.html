@@ -3,194 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saifi Carpenter Premium Dashboard</title>
+    <title>Advanced Furniture & Doc Scanner</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #eef2f3; margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 480px; }
-        h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
-        label { font-weight: bold; display: block; margin-top: 15px; color: #34495e; }
-        input, select { width: 100%; padding: 12px; margin-top: 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
-        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.2s; }
-        button:hover { background-color: #0056b3; }
-        .btn-success { background-color: #28a745; }
-        .btn-success:hover { background-color: #218838; }
-        .btn-danger { background-color: #dc3545; }
-        .btn-danger:hover { background-color: #c82333; }
-        .btn-info { background-color: #17a2b8; color: white; margin-top: 10px; }
-        .btn-info:hover { background-color: #138496; }
-        .switch-link { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; font-size: 14px; text-decoration: underline; }
-        .hidden { display: none; }
-        .record-card { background: #f8f9fa; border-left: 5px solid #28a745; padding: 15px; margin-top: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .record-img, .preview-visual { max-width: 100%; height: auto; border-radius: 8px; margin-top: 12px; display: block; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
-        .result-box { background: #d4edda; padding: 12px; border-radius: 6px; margin-top: 15px; text-align: center; font-weight: bold; color: #155724; font-size: 16px; }
-        .photo-container { margin-top: 15px; text-align: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #121212; color: #fff; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 100vh; padding: 20px; }
         
-        /* 🎥 3D Video Popup Modal Styles */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; position: relative; text-align: center; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #333; font-weight: bold; }
-        .video-frame { width: 100%; height: 280px; border-radius: 8px; margin-top: 15px; }
+        .btn { background: #00ff00; color: #000; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; transition: 0.3s; margin: 10px; }
+        .btn:hover { background: #00cc00; }
+        
+        /* स्क्रीन लेआउट्स */
+        #home-screen { display: block; }
+        #scanner-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* स्कैनिंग स्क्वायर और लेज़र एनीमेशन */
+        .scan-container { position: absolute; top: 15%; left: 10%; width: 80%; height: 60%; border: 3px solid #00ff00; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); border-radius: 8px; overflow: hidden; }
+        .laser-line { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: rgba(0, 255, 0, 0.8); box-shadow: 0 0 15px #00ff00; animation: scanAnimation 2s infinite linear; }
+        
+        @keyframes scanAnimation {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+        
+        /* रिजल्ट और सेटिंग्स स्क्रीन */
+        #result-screen { display: none; background: #1e1e1e; padding: 20px; border-radius: 15px; max-width: 500px; margin: 0 auto; width: 100%; }
+        .preview-box { width: 100%; max-height: 250px; border: 2px solid #333; margin-bottom: 20px; border-radius: 8px; display: none; object-fit: contain; background: #000; }
+        
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: #aaa; }
+        select, input { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 8px; font-size: 16px; }
+        
+        .status-text { font-size: 22px; color: #00ff00; font-weight: bold; margin-bottom: 15px; }
+        
+        /* सोफा ऑप्शंस लिस्ट स्टाइल */
+        .sub-options-list { margin-top: 10px; background: #151515; border-radius: 8px; padding: 10px; display: none; text-align: left; max-height: 200px; overflow-y: auto; }
+        .sub-item { padding: 8px; border-bottom: 1px solid #222; font-size: 15px; color: #ddd; }
+        .sub-item:last-child { border: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- 🔑 लॉगिन स्क्रीन -->
-    <div id="login-screen">
-        <h2>Saifi Carpenter लॉगिन</h2>
-        <label>यूज़रनेम:</label>
-        <input type="text" id="login-user" placeholder="अपना यूज़रनेम डालें">
-        <label>पासवर्ड:</label>
-        <input type="password" id="login-pass" placeholder="अपना पासवर्ड डालें">
-        <button onclick="auth('/api/login', 'login-user', 'login-pass')">लॉगिन करें</button>
-        <div class="switch-link" onclick="toggleScreen(false)">नया अकाउंट (Sign Up) बनाएं</div>
-    </div>
-
-    <!-- 📝 साइनअप स्क्रीन -->
-    <div id="signup-screen" class="hidden">
-        <h2>नया कारपेंटर अकाउंट</h2>
-        <label>यूज़रनेम चुनें:</label>
-        <input type="text" id="signup-user" placeholder="उदा. saifi_furniture">
-        <label>पासवर्ड बनाएं:</label>
-        <input type="password" id="signup-pass" placeholder="कम से कम 4 अक्षर">
-        <button class="btn-success" onclick="auth('/api/signup', 'signup-user', 'signup-pass', true)">अकाउंट रजिस्टर करें</button>
-        <div class="switch-link" onclick="toggleScreen(true)">अकाउंट है? लॉगिन करें</div>
-    </div>
-
-    <!-- 📊 कारपेंटर डैशबोर्ड (लॉगिन के बाद) -->
-    <div id="dashboard-screen" class="hidden">
-        <h2 id="welcome-msg">खाता चालू है</h2>
-        <hr>
+    <!-- 1. होम स्क्रीन -->
+    <div id="home-screen">
+        <h1>दस्तावेज़ एवं फ़र्नीचर स्कैनर</h1>
+        <p style="color: #888; margin: 15px 0 25px;">डॉक्यूमेंट स्कैन करें और सोफा सेट कैटलॉग देखें</p>
         
-        <h3>📐 बजट और Realistic लुक</h3>
+        <!-- मुख्य स्कैन बटन -->
+        <button class="btn" onclick="startScanning()">Scan Document</button>
         
-        <label>काम का प्रकार चुनें:</label>
-        <select id="work-type" onchange="updateRealisticView()">
-            <option value="wardrobe">अलमारी / वार्डरोब (Wardrobe)</option>
-            <option value="kitchen">मॉड्यूलर किचन (Modular Kitchen)</option>
-            <option value="door">डिजाइनर दरवाजा (Premium Door)</option>
-        </select>
+        <hr style="border: 1px solid #222; margin: 25px 0;">
 
-        <label>मटीरियल और फिनिश क्वालिटी:</label>
-        <select id="material-quality">
-            <option value="normal">नॉर्मल फिनिश (कमर्शियल प्लाई + सनमाइका)</option>
-            <option value="luxury">लक्ज़री फिनिश (वाटरप्रूफ प्लाई + एक्रिलिक/लैमिनेट)</option>
-            <option value="ultra">अल्ट्रा प्रीमियम (HDMR + पीयू पॉलिश/विनियर)</option>
-        </select>
-        
-        <!-- 🖼 silence 3D/Realistic फोटो बॉक्स -->
-        <div class="photo-container">
-            <label style="margin-top:0; text-align:left;">Realistic डिज़ाइन प्रीव्यू:</label>
-            <img id="realistic-view" class="preview-visual" src="" alt="Realistic Concept">
-            
-            <!-- 🛠️ 3D Assemble वीडियो देखने का बटन -->
-            <button id="assemble-btn" class="btn-info" onclick="openAssembleVideo()">🛠️ 3D Assembly वीडियो देखें</button>
+        <!-- फ़र्नीचर ऑप्शंस सेक्शन -->
+        <div class="form-group">
+            <label style="font-size: 16px; font-weight: bold; color: #00ff00;">मुख्य फ़र्नीचर चुनें (10 विकल्प):</label>
+            <select id="main-furniture-select" onchange="loadSubOptions()">
+                <option value="">-- कृपया एक विकल्प चुनें --</option>
+                <option value="mandir_sofa">1. Mandir Sofa Set (मंदिर सोफा सेट)</option>
+                <option value="luxury_sofa">2. Luxury L-Shape Sofa</option>
+                <option value="wooden_sofa">3. Traditional Wooden Sofa</option>
+                <option value="modern_recliner">4. Modern Recliner Set</option>
+                <option value="chesterfield">5. Classic Chesterfield</option>
+                <option value="sofa_bed">6. Convertible Sofa Bed</option>
+                <option value="office_sofa">7. Executive Office Sofa</option>
+                <option value="velvet_lounge">8. Premium Velvet Lounge</option>
+                <option value="compact_2seater">9. Compact 2-Seater Sofa</option>
+                <option value="modular_sectional">10. Modular Sectional Sofa</option>
+            </select>
         </div>
 
-        <label style="margin-top:20px;">चौड़ाई (फिट में):</label>
-        <input type="number" id="width" placeholder="उदा. 6" value="6">
-        
-        <label>ऊंचाई (फिट में):</label>
-        <input type="number" id="height" placeholder="उदा. 7" value="7">
-        
-        <button onclick="calculateBudget()">बजट का अनुमान लगाएं</button>
-        <div id="calc-result" class="result-box hidden"></div>
-
-        <label style="margin-top:25px;">ग्राहक का नाम (रिकॉर्ड रखने के लिए):</label>
-        <input type="text" id="job-title" placeholder="उदा. शर्मा जी का फ्लैट काम">
-        
-        <label>साइट की असली फोटो अपलोड करें (यदि उपलब्ध हो):</label>
-        <input type="file" id="job-photo" accept="image/*">
-        
-        <button class="btn-success" onclick="saveRecord()">हिसाब और फोटो डेटाबेस में सेव करें</button>
-        
-        <hr style="margin-top: 30px;">
-        <h3>📁 आपके पुराने रिकॉर्ड्स (तिजोरी)</h3>
-        <div id="records-list">लोड हो रहा है...</div>
-        
-        <button class="btn-danger" onclick="logout()">सुरक्षित लॉगआऊट (Logout)</button>
+        <!-- सब-ऑप्शंस दिखाने का बॉक्स -->
+        <div id="sub-options-container" class="sub-options-list"></div>
     </div>
-</div>
 
-<!-- 📺 वीडियो पॉपअप बॉक्स (Modal Window) -->
-<div id="videoModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeAssembleVideo()">&times;</span>
-        <h3 id="modal-video-title">3D Assembly Guide</h3>
-        <iframe id="assemble-video-player" class="video-frame" src="" frameborder="0" allowfullscreen></iframe>
+    <!-- 2. लाइव कैमरा और लेज़र स्क्रीन -->
+    <div id="scanner-screen">
+        <video id="camera-view" autoplay playsinline></video>
+        <div class="scan-container">
+            <div class="laser-line"></div>
+        </div>
     </div>
-</div>
 
-<script>
-    let loggedInUser = null;
-    let lastCalculatedBudget = 0;
-
-    // Realistic HD फोटो लिंक्स
-    const realisticPhotos = {
-        wardrobe: "https://unsplash.com",
-        kitchen: "https://unsplash.com",
-        door: "https://unsplash.com"
-    };
-
-    // 3D Assembly एनिमेटेड वीडियो लिंक्स (YouTube Embed)
-    const assembleVideos = {
-        wardrobe: "https://youtube.com", 
-        kitchen: "https://youtube.com",  
-        door: "https://youtube.com"     
-    };
-
-    // काम बदलने पर Realistic फोटो और 3D वीडियो को अपडेट करना
-    function updateRealisticView() {
-        const work = document.getElementById('work-type').value;
-        document.getElementById('realistic-view').src = realisticPhotos[work];
+    <!-- 3. स्कैन कम्प्लीट और सेव स्क्रीन (Assemble विकल्प यहाँ से हटा दिया गया है) -->
+    <div id="result-screen">
+        <div class="status-text">✓ Scan Complete</div>
         
-        // वीडियो लिंक और टाइटल सेट करना
-        document.getElementById('assemble-video-player').src = assembleVideos[work];
-        const titles = { wardrobe: "अलमारी 3D Assembly गाइड", kitchen: "मॉड्यूलर किचन 3D Assembly गाइड", door: "दरवाजा Installation गाइड" };
-        document.getElementById('modal-video-title').innerText = titles[work];
-    }
+        <!-- View बटन और प्रीव्यू इमेज -->
+        <button class="btn" style="background:#555; color:#fff;" onclick="togglePreview()">View Document</button>
+        <img id="doc-preview" class="preview-box" alt="Preview">
 
-    // पॉपअप वीडियो खोलने और बंद करने के लॉजिक्स
-    function openAssembleVideo() {
-        document.getElementById('videoModal').style.display = 'flex';
-    }
+        <!-- फॉर्मेट और क्वालिटी सेटिंग्स -->
+        <div class="form-group" style="margin-top: 15px;">
+            <label>फाइल फॉर्मेट चुनें (Save As)</label>
+            <select id="file-format">
+                <option value="pdf">PDF Document (.pdf)</option>
+                <option value="jpg">Image (.jpg)</option>
+                <option value="gif">Animation (.gif)</option>
+            </select>
+        </div>
 
-    function closeAssembleVideo() {
-        document.getElementById('videoModal').style.display = 'none';
-        // वीडियो बंद होने पर प्लेयर रीसेट करना ताकि बैकग्राउंड म्यूजिक बंद हो जाए
-        const player = document.getElementById('assemble-video-player');
-        const currentSrc = player.src;
-        player.src = '';
-        player.src = currentSrc;
-    }
+        <div class="form-group">
+            <label>रेजोल्यूशन (Quality)</label>
+            <select id="file-resolution">
+                <option value="high">High Resolution (1080p)</option>
+                <option value="medium">Medium Resolution (720p)</option>
+                <option value="low">Low Resolution (480p)</option>
+            </select>
+        </div>
 
-    function toggleScreen(showLogin) {
-        document.getElementById('login-screen').classList.toggle('hidden', !showLogin);
-        document.getElementById('signup-screen').classList.toggle('hidden', showLogin);
-    }
+        <div class="form-group">
+            <label>फाइल का नाम (Rename)</label>
+            <input type="text" id="file-name" value="Scanned_Doc_1">
+        </div>
 
-    async function auth(url, userField, passField, isSignup = false) {
-        const username = document.getElementById(userField).value.trim();
-        const password = document.getElementById(passField).value.trim();
-        if(!username || !password) return alert("कृपया दोनों बॉक्स भरें");
+        <!-- अंतिम सेव बटन -->
+        <button class="btn" onclick="saveDocument()">Save Document</button>
+    </div>
 
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        
-        if(res.ok) {
-            alert(data.message || "लॉगिन सफल!");
-            if(!isSignup) {
-                loggedInUser = data.username;
-                showDashboard();
-            } else { toggleScreen(true); }
-        } else { alert(data.error); }
-    }
+    <script>
+        let streamRef = null;
+        const video = document.getElementById('camera-view');
+        const previewImg = document.getElementById('doc-preview');
 
-    function calculateBudget() {
-        const work = document.getElementById('work-type').value;
-        const quality = document.getElementById('material-quality').value;
+        // सभी 10 मुख्य विकल्पों के अंदर के 10-10 सब-ऑप्शंस का डेटा (Fix)
+        const furnitureData = {
+            mandir_sofa: [
+                "1. Traditional Wooden Mandir Sofa", "2. Golden Carved Mandir Sofa", 
+                "3. Premium Teakwood Sofa Set", "4. Compact Puja Room Seating", 
+                "5. Royal Velvet Mandir Chair", "6. White Marble Matching Sofa", 
+                "7. Modern Low-Height Mandir Sofa", "8. Cushion Carved Bench Seating", 
+                "9. Classic Rosewood Sofa Set", "10. Customized Devotional Sofa"
+            ],
+            luxury_sofa: ["1. L-Shape 5 Seater", "2. L-Shape 7 Seater", "3. Fabric Sectional", "4. Leatherette L-Shape", "5. Corner Luxury Fit", "6. Adjustable Headrest", "7. Storage Sectional", "8. Velvet L-Shape", "9. Modern Italian Cut", "10. Premium Tufted Sofa"],
+            wooden_sofa: ["1. Pure Sheesham 3+1+1", "2. Teak Wood Classic", "3. Minimalist Wooden", "4. Antique Polish Finish", "5. Walnut Wood Style", "6. Curved Handrest Wooden", "7. Fabric Cushion Wooden", "8. Heavy Box Wooden", "9. Budget Engineered Wood", "10. Royal Sheesham Carved"],
+            modern_recliner: ["1. Single Motor Recliner", "2. 3-Seater Home Theatre", "3. Manual Leather Recliner", "4. Fabric Rocking Recliner", "5. Dual Side Recliner Sofa", "6. Swivel Recliner Chair", "7. Executive Power Recliner", "8. Luxury Cup Holder Recliner", "9. Massage Recliner Set", "10. Sleek Compact Recliner"],
+            chesterfield: ["1. Deep Tufted Tan Leather", "2. Royal Blue Velvet Chesterfield", "3. Emerald Green 3-Seater", "4. Modern Microfiber Velvet", "5. Classic Faux Leather", "6. Low-Back Tufted Sofa", "7. Vintage Brown Leather", "8. Grey Linen Chesterfield", "9. Premium High-Back Tufted", "10. Compact Studio Chesterfield"],
+            sofa_bed: ["1. Click-Clack Sofa Bed", "2. Pull-Out Queen Size", "3. L-Shape Storage Sofa Bed", "4. Single Folding Futon", "5. Fabric Daybed", "6. Metal Frame Sofa Bed", "7. Modern Velvet Sleeper", "8. Dual Utility Sectional Bed", "9. Kids Mini Sofa Bed", "10. Premium Orthopedic Foam Bed"],
+            office_sofa: ["1. Black Genuine Leather 3-Seater", "2. Sleek Chrome Frame Sofa", "3. Reception Room Lounge Set", "4. High-Density Foam Office Seating", "5. Minimalist Grey Fabric", "6. Executive Cabin Sofa", "7. Modular Office Lounge", "8. Ergonomic Visitor Bench", "9. Compact Semi-Leather Sofa", "10. Premium Tufted Office Sofa"],
+            velvet_lounge: ["1. Premium Curved Lounge Chair", "2. Royal Velvet Chaise", "3. Pastel Pink Modern Sofa", "4. Deep Green Wingback Lounge", "5. Luxury Daybed Velvet", "6. Tufted Velvet Bench", "7. Contemporary Round Sofa", "8. High-Gloss Velvet Sectional", "9. Golden Leg Accent Sofa", "10. Custom Designer Lounge Set"],
+            compact_2seater: ["1. Loveseat for Apartments", "2. Scandinavian Wooden 2-Seater", "3. Mid-Century Modern Loveseat", "4. Sleek Leather 2-Seater", "5. Tufted Fabric Loveseat", "6. High-Leg Studio Sofa", "7. Cushion-Back Compact Sofa", "8. Budget Microfiber 2-Seater", "9. Armless Compact Bench", "10. Vintage Parlour Loveseat"],
+            modular_sectional: ["1. U-Shape 9 Seater Giant", "2. Infinite Configuration Modular", "3. Moving Block Sectional", "4. Performance Fabric Modular", "5. Low-Profile Floor Sectional", "6. Cozy Oversized Blocks", "7. Waterproof Outdoor Sectional", "8. Custom Fabric Sectional Blocks", "9. Corner Fitting Modular", "10. Eco-Friendly Material Sectional"]
+        };
+
+        // सोफा सेट प्रकार लोड और शो करने का फंक्शन (Fix)
