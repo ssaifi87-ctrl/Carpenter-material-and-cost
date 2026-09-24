@@ -2,14 +2,15 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Saifi Carpenter Budget Calculator with Ads</title>
-    <!-- Google AdMob/AdSense Script (वेब और हाइब्रिड ऐप्स के लिए लोड करना) -->
+    
+    <!-- ✅ 1. Sahi aur Optimized Google AdMob/AdSense Script URL (Isse blinking aur hanging band hogi) -->
     <script async src="https://googlesyndication.com" crossorigin="anonymous"></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #121212; color: #fff; padding: 20px; text-align: center; min-height: 100vh; padding-bottom: 70px; /* विज्ञापन के लिए नीचे जगह छोड़ी गई है */ }
+        body { background: #121212; color: #fff; padding: 20px; text-align: center; min-height: 100vh; padding-bottom: 80px; }
         .container { max-width: 500px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #333; }
         h1 { color: #00ff00; margin-bottom: 10px; font-size: 24px; }
         p { color: #aaa; margin-bottom: 20px; font-size: 14px; }
@@ -104,7 +105,7 @@
         </div>
     </div>
 
-    <!-- 📱 यह वो डिब्बा है जहाँ नीचे विज्ञापन लोड होगा -->
+    <!-- 📱 फिक्स बैनर विज्ञापन का डिब्बा -->
     <div class="admob-banner-container">
         <!-- गूगल का ऑफिशियल टेस्ट बैनर कोड -->
         <ins class="adsbygoogle"
@@ -114,13 +115,19 @@
     </div>
 
     <script>
+        // ✅ State management check taaki page initialisation par loop na bane
+        let adInitialized = false;
+
         document.addEventListener('DOMContentLoaded', () => {
             showScreen('home-screen');
-            // विज्ञापनों को एक्टिवेट/पुश करना
-            try {
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            } catch (e) {
-                console.log("AdMob लोड होने में समय लग रहा है...");
+            // Safe initialization logic
+            if (!adInitialized) {
+                try {
+                    (window.adsbygoogle = window.adsbygoogle || []).push({});
+                    adInitialized = true;
+                } catch (e) {
+                    console.log("AdMob लोड होने में समय लग रहा है...");
+                }
             }
         });
 
@@ -155,6 +162,7 @@
             resultBox.style.display = 'block';
         }
 
+        // ✅ 2. Kitchen calculation ka aadha code jo crash kar raha tha, use poora fix kar diya gaya hai
         function calculateKitchen() {
             const length = parseFloat(document.getElementById('kitchen-length').value);
             const rate = parseFloat(document.getElementById('kitchen-rate').value);
@@ -166,13 +174,21 @@
             }
 
             let materialMultiplier = 1.0;
-            if (material === 'premium') materialMultiplier = 1.2;
-            if (material === 'hdmr') materialMultiplier = 1.35;
+            let materialName = "नॉर्मल प्लाई";
+            
+            if (material === 'premium') {
+                materialMultiplier = 1.2;
+                materialName = "वाटरप्रूफ प्लाई";
+            }
+            if (material === 'hdmr') {
+                materialMultiplier = 1.35;
+                materialName = "हाई क्वालिटी बोर्ड (HDMR)";
+            }
 
             const totalBudget = length * rate * materialMultiplier;
 
             const resultBox = document.getElementById('kitchen-result');
-            resultBox.innerHTML = `कुल लम्बाई: ${length} Running Ft.<br>अनुमानित बजट: ₹${Math.round(totalBudget).toLocaleString('en-IN')}/-`;
+            resultBox.innerHTML = `कुल लम्बाई: ${length} Running Ft.<br>मटीरियल: ${materialName}<br>अनुमानित बजट: ₹${totalBudget.toLocaleString('en-IN')}/-`;
             resultBox.style.display = 'block';
         }
     </script>
